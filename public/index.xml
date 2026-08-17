@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>我的技术博客</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content on 我的技术博客</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Sun, 16 Aug 2026 12:00:00 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>我的第一篇博客</title>
+      <link>http://localhost:1313/posts/first-post/</link>
+      <pubDate>Sun, 16 Aug 2026 12:00:00 +0800</pubDate>
+      <guid>http://localhost:1313/posts/first-post/</guid>
+      <description>&lt;h1 id=&#34;搭建自己的网站实操&#34;&gt;搭建自己的网站实操&lt;/h1&gt;
+&lt;p&gt;这是我用 Hugo + PaperMod 搭建的第一篇文章。&lt;/p&gt;
+&lt;p&gt;自己搭建一个网站在我这种工科学校毕业，没接触过计算机的人，很难想象。&lt;/p&gt;
+&lt;p&gt;感谢AI大时代的来临，手把手的教我拿到结果&lt;/p&gt;
+&lt;p&gt;OK，我搭建网站经过了几步，我希望从大体上说一下&lt;/p&gt;
+&lt;p&gt;##研究采用哪种形式##&lt;/p&gt;
+&lt;p&gt;常见的网站形式有两种&lt;/p&gt;
+&lt;p&gt;第一种，（Hugo + PaperMod）静态的，特点是搭建简单，风格简约，维护花费精力少，上手容易，适合专注于写一些技术文章或随笔日记的人群；&lt;/p&gt;
+&lt;p&gt;第二种，（Next.js Portfolio）动态的，特点是动画及交互界面流畅炫酷，但因版本迭代，需要定期维护，上手有些门槛，适合以此作为门面的创作者。&lt;/p&gt;
+&lt;p&gt;本地访问地址：&lt;/p&gt;
+&lt;p&gt;电脑：http://127.0.0.1:1313&lt;/p&gt;
+&lt;p&gt;同一WiFi手机：http://172.17.10.108:1313&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
