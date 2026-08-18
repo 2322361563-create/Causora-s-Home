@@ -1,13 +1,10 @@
 {
-  "buildCommand": "hugo --gc --minify",
+  "buildCommand": "curl -sL https://github.com/gohugoio/hugo/releases/download/v0.136.5/hugo_extended_0.136.5_linux-amd64.tar.gz | tar xz -C /usr/local/bin && hugo --gc --minify",
   "outputDirectory": "public",
-  "env": {
-    "HUGO_VERSION": "0.136.5"
-  },
   "rewrites": [
     {
       "source": "/posts/(.*)",
-      "destination": "index.html"
+      "destination": "/posts/$1/index.html"
     },
     {
       "source": "/(.*)",
