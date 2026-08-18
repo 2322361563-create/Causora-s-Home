@@ -1,25 +1,28 @@
 {
-    "buildCommand": "hugo --gc --minify",
-    "outputDirectory": "public",
-    "rewrites": [
+  "buildCommand": "git submodule update --init --recursive && hugo --gc --minify",
+  "outputDirectory": "public",
+  "env": {
+    "HUGO_VERSION": "0.136.5"
+  },
+  "rewrites": [
+    {
+      "source": "/posts/(.*)",
+      "destination": "/posts/$1/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
         {
-            "source": "/posts/(.*)",
-            "destination": "/posts/$1/index.html"
-        },
-        {
-            "source": "/(.*)",
-            "destination": "/$1"
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
-    ],
-    "headers": [
-        {
-            "source": "/(.*)",
-            "headers": [
-                {
-                    "key": "Cache-Control",
-                    "value": "public, max-age=31536000, immutable"
-                }
-            ]
-        }
-    ]
+      ]
+    }
+  ]
 }
