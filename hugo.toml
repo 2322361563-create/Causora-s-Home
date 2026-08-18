@@ -1,4 +1,4 @@
-baseURL = "https://xxx.github.io/"
+baseURL = "https://www.causora.net/"
 locale = "zh-cn"
 title = "我的技术博客"
 theme = "PaperMod"
