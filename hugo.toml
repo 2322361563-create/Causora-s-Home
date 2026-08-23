@@ -1,4 +1,4 @@
-baseURL = "https://www.causora.net/"
+baseURL = "https://causora.net/"
 locale = "zh-cn"
 title = "我的技术博客"
 theme = "PaperMod"
@@ -23,4 +23,3 @@ theme = "PaperMod"
     name = "关于"
     url = "/about/"
     weight = 3
-    
