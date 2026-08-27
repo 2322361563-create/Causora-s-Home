@@ -1,0 +1,114 @@
+{{- $places := where .Site.RegularPages "Section" "places" }}
+{{- $data := slice }}
+{{- range $places }}
+  {{- $desc := .Params.description | default (.Summary | plainify) }}
+  {{- $data = $data | append (dict
+      "name" .Title
+      "lat" (.Params.lat | default 0)
+      "lon" (.Params.lon | default 0)
+      "url" .Permalink
+      "desc" $desc
+    ) }}
+{{- end }}
+
+<div class="home-map-block">
+  <div id="home-map" style="height:380px;width:100%;border-radius:10px;"></div>
+  <div style="text-align:center;margin-top:12px;">
+    <a href="/map/" class="map‑enter‑btn">进入全屏地图</a>
+  </div>
+</div>
+
+<script>
+window.HOME_LANDMARKS = {{ $data | jsonify | safeJS }};
+</script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+(function(){
+    var mapDom = document.getElementById('home-map');
+    if(!mapDom || typeof L === "undefined") return;
+
+    var map = L.map('home-map',{zoomSnap:0.5});
+    var bounds = L.latLngBounds([]);
+
+    //高德底图
+    L.tileLayer("https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}",{
+        subdomains:["1","2","3","4"],
+        maxZoom:18,
+        attribution:'&copy; <a href="https://ditu.amap.com/">高德地图</a>'
+    }).addTo(map);
+
+    //雾蓝色脉冲标记
+    var highlightIcon = L.divIcon({
+        className:'',
+        html:'<div class="highlight-marker"></div>',
+        iconSize:[20,30],
+        iconAnchor:[10,30]
+    });
+
+    (window.HOME_LANDMARKS||[]).forEach(function(item){
+        if(!item.lat||!item.lon) return;
+        var marker = L.marker([item.lat, item.lon],{icon:highlightIcon}).addTo(map);
+        marker.bindPopup(
+            '<div class="map-popup">' +
+            '<div class="map-popup-name">'+item.name+'</div>'+
+            (item.desc?'<div class="map-popup-desc">'+item.desc+'</div>':'')+
+            '<a class="map-popup-link" href="'+item.url+'" target="_blank">查看详细介绍 →</a>'+
+            '</div>'
+        );
+        bounds.extend([item.lat, item.lon]);
+    });
+
+    if(bounds.isValid()){
+        map.fitBounds(bounds,{padding:[20,20]});
+    }else{
+        map.setView([23.129,113.264],11);
+    }
+})();
+</script>
+
+<style>
+.map‑enter‑btn{
+    display:inline-block;
+    padding:8px 22px;
+    background:#5B8FF9;
+    color:#fff;
+    border-radius:6px;
+    text-decoration:none;
+}
+.map‑enter‑btn:hover{
+    background:#4778dd;
+}
+  .highlight-marker {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background: #5B8FF9;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 rgba(91,143,249, 0.7);
+    animation: pulse 2s infinite;
+  }
+  .highlight-marker::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #5B8FF9;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(91,143,249, 0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(91,143,249, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(91,143,249, 0); }
+  }
+  .map-popup-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .map-popup-desc { font-size: 13px; color: #555; margin-bottom: 8px; line-height: 1.5; max-width: 240px; }
+  .map-popup-link { display: inline-block; font-size: 13px; color: #0969da; text-decoration: none; font-weight: 500; }
+  .map-popup-link:hover { text-decoration: underline; }
+</style>
+

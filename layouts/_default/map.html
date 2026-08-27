@@ -1,0 +1,142 @@
+{{- define "main" }}
+{{- $places := where .Site.RegularPages "Section" "places" }}
+{{- $data := slice }}
+{{- range $places }}
+  {{- $desc := .Params.description | default (.Summary | plainify) }}
+  {{- $data = $data | append (dict
+      "name" .Title
+      "lat" (.Params.lat | default 0)
+      "lon" (.Params.lon | default 0)
+      "url" .Permalink
+      "desc" $desc
+    ) }}
+{{- end }}
+<div class="map-wrapper">
+  <h1 class="map-title">{{ .Title }}</h1>
+  <div class="map-intro">{{ .Content }}</div>
+  <div id="map" class="map-canvas"></div>
+  <noscript><p style="padding:1rem">需要开启 JavaScript 才能显示地图。</p></noscript>
+</div>
+
+<script>
+  window.LANDMARKS = {{ $data | jsonify | safeJS }};
+</script>
+
+<!-- Leaflet 基础库 -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- 全屏控件插件 -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@3.0.2/Control.FullScreen.css" />
+<script src="https://unpkg.com/leaflet.fullscreen@3.0.2/Control.FullScreen.js"></script>
+
+<script>
+(function () {
+  var container = document.getElementById("map");
+  if (!container || typeof L === "undefined") return;
+
+  var map = L.map("map", {
+    fullscreenControl: true,
+    fullscreenControlOptions: {
+      position: 'topright',
+      title: '全屏查看',
+      titleCancel: '退出全屏'
+    },
+    zoomSnap: 0.5,
+    zoomDelta: 1
+  });
+
+  var bounds = L.latLngBounds([]);
+
+  // 高德矢量底图
+  L.tileLayer("https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}", {
+    subdomains: ["1", "2", "3", "4"],
+    maxZoom: 18,
+    minZoom: 3,
+    crossOrigin: true,
+    attribution: '&copy; <a href="https://ditu.amap.com/">高德地图</a>'
+  }).addTo(map);
+
+  // 雾蓝色高亮脉冲标记
+  var highlightIcon = L.divIcon({
+    className: '',
+    html: '<div class="highlight-marker"></div>',
+    iconSize: [20, 30],
+    iconAnchor: [10, 30]
+  });
+
+  // 直接使用原始GCJ‑02坐标，不再转换！
+  (window.LANDMARKS || []).forEach(function (item) {
+    if (!item.lat || !item.lon) return;
+    var marker = L.marker([item.lat, item.lon], { icon: highlightIcon }).addTo(map);
+    marker.bindPopup(
+      '<div class="map-popup">' +
+        '<div class="map-popup-name">' + item.name + '</div>' +
+        (item.desc ? '<div class="map-popup-desc">' + item.desc + '</div>' : '') +
+        '<a class="map-popup-link" href="' + item.url +
+          '" target="_blank" rel="noopener">查看详细介绍 →</a>' +
+      '</div>'
+    );
+    bounds.extend([item.lat, item.lon]);
+  });
+
+  if (bounds.isValid()) {
+    map.fitBounds(bounds, { padding: [40, 40] });
+  } else {
+    map.setView([23.129, 113.264], 11);
+  }
+
+  setTimeout(function() {
+    if (!map.isFullscreen()) {
+      map.toggleFullscreen();
+    }
+  }, 200);
+})();
+</script>
+
+<style>
+  .map-canvas { 
+    position: relative; 
+    z-index: 0; 
+    height: 75vh; 
+    min-height: 500px;
+    width: 100%; 
+    border-radius: 10px; 
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08); 
+  }
+  .map-title { margin-bottom: .25rem; }
+  .map-intro { margin-bottom: 1rem; color: #666; }
+
+  .highlight-marker {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    background: #5B8FF9;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 rgba(91,143,249, 0.7);
+    animation: pulse 2s infinite;
+  }
+  .highlight-marker::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #5B8FF9;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(91,143,249, 0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(91,143,249, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(91,143,249, 0); }
+  }
+
+  .map-popup-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .map-popup-desc { font-size: 13px; color: #555; margin-bottom: 8px; line-height: 1.5; max-width: 240px; }
+  .map-popup-link { display: inline-block; font-size: 13px; color: #0969da; text-decoration: none; font-weight: 500; }
+  .map-popup-link:hover { text-decoration: underline; }
+</style>
+{{- end }}
